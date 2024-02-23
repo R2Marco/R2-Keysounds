@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reproducción de sonido al pulsar teclas</title>
+    <style>
+        #lastKey {
+            font-size: 550px;
+            text-align: center;
+            margin-top: 50px;
+color:white;
+        }
+
+
+
+
+BODY {
+            Background-color:blue;
+        }
+
+
+
+
+
+
+
+    </style>
+</head>
+<body>
+    <h1>Reproducción de sonido al pulsar teclas</h1>
+    
+    <button onclick="startListening()">Iniciar Escucha</button>
+    <button onclick="stopListening()">Detener Escucha</button>
+    
+    <div id="lastKey"></div>
+
+    <script>
+        // Variable para almacenar el contexto de audio
+        var audioContext;
+
+        // Variable para almacenar el elemento HTML del nombre de la última tecla pulsada
+        var lastKeyElement = document.getElementById('lastKey');
+
+        // Función para iniciar la escucha de las teclas
+        function startListening() {
+            document.addEventListener('keydown', handleKeyDown);
+        }
+
+        // Función para detener la escucha de las teclas
+        function stopListening() {
+            document.removeEventListener('keydown', handleKeyDown);
+        }
+
+        // Función para reproducir el sonido al pulsar una tecla
+        function handleKeyDown(event) {
+            // Crear un nuevo contexto de audio si no existe
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            // Obtener el código ASCII de la tecla pulsada
+            var keyCode = event.keyCode || event.which;
+
+            // Calcular la frecuencia basada en el código ASCII y un intervalo predefinido
+            var frequency = calculateFrequency(keyCode);
+
+            // Crear un oscilador
+            var oscillator = audioContext.createOscillator();
+            oscillator.frequency.value = frequency;
+
+            // Conectar el oscilador al destino de audio
+            oscillator.connect(audioContext.destination);
+
+            // Iniciar la reproducción del sonido
+            oscillator.start();
+
+            // Mostrar el nombre de la última tecla pulsada
+            /////////////var keyName = getKeyNoteName(keyCode);
+            lastKeyElement.textContent = String.fromCharCode(keyCode);
+
+            // Detener la reproducción después de un tiempo
+            setTimeout(function() {
+                oscillator.stop();
+                oscillator.disconnect();
+                oscillator = null;
+                lastKeyElement.textContent = '';
+            }, 500); // Duración en milisegundos (ejemplo: 0.5 segundos)
+        }
+
+        // Función para calcular la frecuencia basada en el código ASCII y un intervalo
+        function calculateFrequency(keyCode) {
+            // Intervalo entre frecuencias (ejemplo: 25 Hz)
+            var interval = 5;
+
+            // Frecuencia base (ejemplo:100 Hz)
+            var baseFrequency = 30;
+
+            // Calcular la frecuencia sumando el intervalo al valor base
+            return baseFrequency + (interval * keyCode);
+        }
+
+        // Función para obtener el nombre de la nota musical correspondiente al código ASCII
+        function getKeyNoteName(keyCode) {
+            // Mapeo de los códigos ASCII a los nombres de las notas musicales
+            var noteNames = {
+                65: 'C',
+                83: 'D',
+                68: 'E',
+                70: 'F',
+                71: 'G',
+                72: 'A',
+                74: 'B',
+            };
+
+            // Obtener el nombre de la nota musical basado en el código ASCII
+            return noteNames[keyCode] || '';
+        }
+    </script>
+</body>
+</html>
